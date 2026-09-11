@@ -1,0 +1,1674 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Monthly Musts</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wght@600;700;800&family=Public+Sans:wght@400;600;700&display=swap">
+<style>
+  html { color-scheme: light dark; }
+  body { margin: 0; font-size: 14px; font-family: system-ui, sans-serif; }
+  img { max-width: 100%; }
+  [hidden] { display: none !important; }
+  :root {
+    --bg: #F3F5F7;
+    --surface: #FFFFFF;
+    --ink: #17222C;
+    --muted: #5F6C79;
+    --line: #D8DEE5;
+    --accent: #2B50C8;
+    --accent-ink: #FFFFFF;
+    --done: #2F7D53;
+    --done-wash: #E4F2E9;
+    --chip-bg: #EAEEF2;
+    --danger: #B4372F;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --bg: #10161D;
+      --surface: #1A222C;
+      --ink: #E7ECF1;
+      --muted: #8B97A5;
+      --line: #2C3743;
+      --accent: #7E97F2;
+      --accent-ink: #0F1420;
+      --done: #5CBF88;
+      --done-wash: #1D3327;
+      --chip-bg: #232D38;
+      --danger: #E07A72;
+    }
+  }
+  :root[data-theme="dark"] {
+    --bg: #10161D;
+    --surface: #1A222C;
+    --ink: #E7ECF1;
+    --muted: #8B97A5;
+    --line: #2C3743;
+    --accent: #7E97F2;
+    --accent-ink: #0F1420;
+    --done: #5CBF88;
+    --done-wash: #1D3327;
+    --chip-bg: #232D38;
+    --danger: #E07A72;
+  }
+
+  * { box-sizing: border-box; }
+  body {
+    background: var(--bg);
+    color: var(--ink);
+    font-family: "Public Sans", system-ui, -apple-system, sans-serif;
+    font-size: 15px;
+    line-height: 1.45;
+    margin: 0;
+    padding: 0 20px 80px;
+  }
+  .wrap { max-width: 880px; margin: 0 auto; }
+
+  /* ---------- masthead ---------- */
+  .eyebrow {
+    font-family: "Archivo", "Public Sans", sans-serif;
+    font-weight: 700;
+    font-size: 12px;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: var(--accent);
+    margin: 28px 0 4px;
+  }
+  .masthead {
+    display: flex;
+    align-items: baseline;
+    gap: 14px;
+    flex-wrap: wrap;
+  }
+  .month-name {
+    font-family: "Archivo", "Public Sans", sans-serif;
+    font-weight: 800;
+    font-size: clamp(30px, 6vw, 46px);
+    letter-spacing: -0.01em;
+    margin: 0;
+    text-wrap: balance;
+  }
+  .month-nav { display: flex; gap: 6px; align-items: center; }
+  .month-nav button {
+    font: inherit;
+    font-weight: 700;
+    background: var(--surface);
+    color: var(--ink);
+    border: 1px solid var(--line);
+    border-radius: 8px;
+    width: 34px; height: 34px;
+    cursor: pointer;
+  }
+  .month-nav button:hover { border-color: var(--accent); color: var(--accent); }
+  .today-link {
+    font: inherit;
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--accent);
+    background: none;
+    border: none;
+    cursor: pointer;
+    padding: 4px 6px;
+  }
+
+  .progress-row {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin: 14px 0 6px;
+  }
+  .progress-track {
+    flex: 1;
+    height: 8px;
+    border-radius: 99px;
+    background: var(--chip-bg);
+    overflow: hidden;
+  }
+  .progress-fill {
+    height: 100%;
+    background: var(--done);
+    border-radius: 99px;
+    width: 0%;
+    transition: width 0.35s ease;
+  }
+  .progress-label {
+    font-variant-numeric: tabular-nums;
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--muted);
+    white-space: nowrap;
+  }
+
+  .note {
+    font-size: 13px;
+    color: var(--muted);
+    margin: 6px 0 0;
+  }
+  .note.warn { color: var(--danger); }
+
+  /* ---------- tiers ---------- */
+  .tier { margin-top: 34px; }
+  .tier-head {
+    display: flex;
+    align-items: baseline;
+    gap: 10px;
+    border-bottom: 1px solid var(--line);
+    padding-bottom: 6px;
+    margin-bottom: 14px;
+  }
+  .tier-label {
+    font-family: "Archivo", "Public Sans", sans-serif;
+    font-weight: 700;
+    font-size: 13px;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+    margin: 0;
+  }
+  .tier-count {
+    font-size: 12px;
+    font-variant-numeric: tabular-nums;
+    color: var(--muted);
+  }
+  .tier-empty { font-size: 13px; color: var(--muted); margin: 0; }
+
+  .grid-3 { display: grid; grid-template-columns: repeat(auto-fill, minmax(250px, 1fr)); gap: 12px; }
+  .grid-2 { display: grid; grid-template-columns: repeat(auto-fill, minmax(175px, 1fr)); gap: 10px; }
+  .grid-1 { display: flex; flex-wrap: wrap; gap: 8px; }
+
+  /* ---------- task buttons ---------- */
+  .task {
+    font: inherit;
+    text-align: left;
+    color: var(--ink);
+    background: var(--surface);
+    border: 1px solid var(--line);
+    border-bottom-width: 3px;
+    cursor: pointer;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    gap: 6px;
+    transition: transform 0.06s ease, border-color 0.12s ease, background 0.12s ease;
+  }
+  .task:active { transform: translateY(1px); border-bottom-width: 1px; }
+  .task:hover { border-color: var(--accent); }
+  .task:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+
+  .task.t3 { border-radius: 14px; padding: 18px 18px 14px; min-height: 116px; }
+  .task.t3 .task-name { font-family: "Archivo", "Public Sans", sans-serif; font-weight: 700; font-size: 20px; line-height: 1.25; }
+  .task.t2 { border-radius: 11px; padding: 12px 14px 10px; min-height: 78px; }
+  .task.t2 .task-name { font-weight: 600; font-size: 15px; }
+  .task.t1 {
+    border-radius: 99px;
+    padding: 7px 14px;
+    min-height: 0;
+    flex-direction: row;
+    align-items: center;
+    gap: 8px;
+    background: var(--chip-bg);
+  }
+  .task.t1 .task-name { font-weight: 600; font-size: 13px; }
+
+  .task-meta {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 12px;
+    color: var(--muted);
+  }
+  .task.t1 .task-meta { gap: 5px; }
+  .badge-recurring { font-size: 11px; }
+  .due-label { font-weight: 600; }
+  .due-label.overdue { color: var(--danger); }
+  .task.overdue, .task.overdue:hover { border-color: var(--danger); }
+
+  /* ---------- notes & checklists ---------- */
+  .task.t1 { flex-wrap: wrap; }
+  .task-note {
+    font-size: 12px;
+    font-style: italic;
+    color: var(--muted);
+    white-space: pre-wrap;
+    overflow-wrap: anywhere;
+    margin: 0;
+  }
+  .note-btn {
+    font: inherit;
+    font-size: 12px;
+    background: none;
+    border: none;
+    color: var(--muted);
+    cursor: pointer;
+    padding: 0 2px;
+  }
+  .note-btn:hover { color: var(--accent); }
+  .note-edit {
+    width: 100%;
+    font: inherit;
+    font-size: 12.5px;
+    background: var(--bg);
+    color: var(--ink);
+    border: 1px solid var(--line);
+    border-radius: 7px;
+    padding: 6px 8px;
+    min-height: 46px;
+    resize: vertical;
+  }
+  .note-edit:focus-visible { outline: 2px solid var(--accent); outline-offset: 1px; }
+  .sub-list { display: flex; flex-direction: column; gap: 2px; flex-basis: 100%; }
+  .sub-row {
+    font: inherit;
+    font-size: 13px;
+    text-align: left;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    background: none;
+    border: none;
+    color: var(--ink);
+    cursor: pointer;
+    padding: 4px 2px;
+    border-radius: 6px;
+  }
+  .sub-row:hover { background: var(--chip-bg); }
+  .sub-box {
+    width: 15px; height: 15px;
+    border: 1.5px solid var(--muted);
+    border-radius: 4px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 11px;
+    color: var(--done);
+    flex-shrink: 0;
+  }
+  .sub-row.done .sub-box { border-color: var(--done); background: var(--done-wash); }
+  .sub-row.done .sub-name { color: var(--muted); text-decoration: line-through; }
+  .chev { font-size: 10px; color: var(--muted); }
+
+  /* ---------- calendar view ---------- */
+  .view-seg { display: flex; border: 1px solid var(--line); border-radius: 9px; overflow: hidden; flex: 0 0 auto; }
+  .view-seg button {
+    font: inherit;
+    font-size: 12.5px;
+    font-weight: 600;
+    padding: 6px 13px;
+    background: var(--surface);
+    color: var(--muted);
+    border: none;
+    cursor: pointer;
+  }
+  .view-seg button + button { border-left: 1px solid var(--line); }
+  .view-seg button.sel { background: var(--accent); color: var(--accent-ink); }
+  .view-seg button:focus-visible { outline: 2px solid var(--accent); outline-offset: -2px; }
+  .cal-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 6px; margin-top: 24px; }
+  .cal-dow {
+    font-family: "Archivo", "Public Sans", sans-serif;
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--muted);
+    text-align: center;
+    padding-bottom: 2px;
+  }
+  .cal-cell {
+    min-height: 86px;
+    background: var(--surface);
+    border: 1px solid var(--line);
+    border-radius: 9px;
+    padding: 5px 6px;
+    display: flex;
+    flex-direction: column;
+    gap: 3px;
+    min-width: 0;
+  }
+  .cal-cell.blank { background: none; border-style: dashed; opacity: 0.35; min-height: 0; }
+  .cal-cell.today { border-color: var(--accent); box-shadow: inset 0 0 0 1px var(--accent); }
+  .cal-num { font-size: 11px; font-weight: 700; color: var(--muted); font-variant-numeric: tabular-nums; }
+  .cal-cell.today .cal-num { color: var(--accent); }
+  .cal-item {
+    font: inherit;
+    font-size: 11px;
+    font-weight: 600;
+    text-align: left;
+    border: none;
+    border-radius: 6px;
+    padding: 3px 6px;
+    background: var(--chip-bg);
+    color: var(--ink);
+    cursor: pointer;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    max-width: 100%;
+  }
+  .cal-item.i3 { background: var(--accent); color: var(--accent-ink); }
+  .cal-item.i1 { background: none; border: 1px solid var(--line); font-weight: 500; }
+  .cal-item.done { background: var(--done-wash); color: var(--muted); text-decoration: line-through; border: none; }
+  .cal-item.over { outline: 1.5px solid var(--danger); }
+  .cal-anytime { margin-top: 20px; }
+  .cal-anytime h3 {
+    font-family: "Archivo", "Public Sans", sans-serif;
+    font-size: 12px;
+    font-weight: 700;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--muted);
+    margin: 0 0 8px;
+  }
+  .cal-anytime .cal-row { display: flex; flex-wrap: wrap; gap: 6px; }
+  .cal-anytime .cal-item { font-size: 12.5px; padding: 6px 10px; border-radius: 99px; }
+
+  .who-chips { display: flex; flex-wrap: wrap; gap: 6px; align-items: center; }
+  .who-chip {
+    font: inherit;
+    font-size: 12.5px;
+    font-weight: 600;
+    border: 1px solid var(--line);
+    background: var(--surface);
+    color: var(--muted);
+    border-radius: 99px;
+    padding: 6px 12px;
+    cursor: pointer;
+  }
+  .who-chip:hover { border-color: var(--accent); color: var(--accent); }
+  .who-chip.sel { background: var(--accent); color: var(--accent-ink); border-color: var(--accent); }
+  .who-chip.sel:hover { color: var(--accent-ink); }
+  .who-chip.small { padding: 3px 9px; font-size: 11.5px; }
+  .who-chip:focus-visible { outline: 2px solid var(--accent); outline-offset: 1px; }
+
+  /* ---------- person tabs ---------- */
+  .tabs {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 2px;
+    margin-top: 20px;
+    border-bottom: 1px solid var(--line);
+  }
+  .tab {
+    font-family: "Archivo", "Public Sans", sans-serif;
+    font-weight: 700;
+    font-size: 13px;
+    letter-spacing: 0.04em;
+    background: none;
+    border: none;
+    border-bottom: 2px solid transparent;
+    padding: 8px 13px;
+    margin-bottom: -1px;
+    color: var(--muted);
+    cursor: pointer;
+  }
+  .tab:hover { color: var(--ink); }
+  .tab.sel { color: var(--accent); border-bottom-color: var(--accent); }
+  .tab:focus-visible { outline: 2px solid var(--accent); outline-offset: -2px; }
+
+  .people-summary {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(175px, 1fr));
+    gap: 10px;
+    margin-top: 16px;
+  }
+  .person-card {
+    background: var(--surface);
+    border: 1px solid var(--line);
+    border-radius: 11px;
+    padding: 10px 12px;
+    cursor: pointer;
+  }
+  .person-card:hover { border-color: var(--accent); }
+  .person-card .p-name { font-weight: 700; font-size: 14px; }
+  .person-card .p-stat { font-size: 12px; color: var(--muted); font-variant-numeric: tabular-nums; margin-top: 2px; }
+  .person-card .p-overdue { color: var(--danger); font-weight: 600; }
+  .person-card .p-track { height: 5px; border-radius: 99px; background: var(--chip-bg); margin-top: 8px; overflow: hidden; }
+  .person-card .p-fill { height: 100%; background: var(--done); }
+
+  .checkmark {
+    display: none;
+    color: var(--done);
+    font-weight: 700;
+    flex-shrink: 0;
+  }
+  .task.done { background: var(--done-wash); border-color: var(--done); }
+  .task.done .task-name { color: var(--muted); text-decoration: line-through; text-decoration-thickness: 1px; }
+  .task.done .checkmark { display: inline; }
+
+  /* ---------- manage mode ---------- */
+  .manage-controls { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 4px; }
+  .mini-btn {
+    font: inherit;
+    font-size: 12px;
+    font-weight: 600;
+    background: var(--surface);
+    color: var(--ink);
+    border: 1px solid var(--line);
+    border-radius: 7px;
+    padding: 4px 9px;
+    cursor: pointer;
+  }
+  .mini-btn:hover { border-color: var(--accent); color: var(--accent); }
+  .mini-btn.delete:hover { border-color: var(--danger); color: var(--danger); }
+  .task.managing { cursor: default; }
+  .task.managing .task-name { cursor: text; }
+  .task.managing:hover { border-color: var(--line); }
+
+  /* ---------- add form ---------- */
+  .add-panel {
+    margin-top: 44px;
+    background: var(--surface);
+    border: 1px solid var(--line);
+    border-radius: 14px;
+    padding: 18px;
+  }
+  .add-panel h2 {
+    font-family: "Archivo", "Public Sans", sans-serif;
+    font-weight: 700;
+    font-size: 15px;
+    letter-spacing: 0.02em;
+    margin: 0 0 12px;
+  }
+  .add-row { display: flex; flex-wrap: wrap; gap: 10px; align-items: center; }
+  .add-name {
+    font: inherit;
+    flex: 1 1 240px;
+    background: var(--bg);
+    color: var(--ink);
+    border: 1px solid var(--line);
+    border-radius: 9px;
+    padding: 10px 12px;
+  }
+  .add-name:focus-visible { outline: 2px solid var(--accent); outline-offset: 1px; }
+  .add-date { flex: 0 1 165px; }
+  .add-repeat { flex: 0 1 160px; cursor: pointer; }
+  .mini-input {
+    font: inherit;
+    font-size: 12px;
+    font-weight: 600;
+    background: var(--surface);
+    color: var(--ink);
+    border: 1px solid var(--line);
+    border-radius: 7px;
+    padding: 3px 7px;
+  }
+
+  .seg { display: flex; border: 1px solid var(--line); border-radius: 9px; overflow: hidden; }
+  .seg button {
+    font: inherit;
+    font-weight: 600;
+    background: var(--surface);
+    color: var(--muted);
+    border: none;
+    cursor: pointer;
+    padding: 10px 12px;
+  }
+  .seg button + button { border-left: 1px solid var(--line); }
+  .seg button.sel { background: var(--accent); color: var(--accent-ink); }
+  .seg button:focus-visible { outline: 2px solid var(--accent); outline-offset: -2px; }
+  .seg .s3 { font-size: 15px; }
+  .seg .s2 { font-size: 13px; }
+  .seg .s1 { font-size: 11.5px; }
+
+  .toggle-label {
+    display: flex;
+    align-items: center;
+    gap: 7px;
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--muted);
+    cursor: pointer;
+    user-select: none;
+  }
+  .toggle-label input { accent-color: var(--accent); width: 16px; height: 16px; cursor: pointer; }
+
+  .add-btn {
+    font: inherit;
+    font-weight: 700;
+    background: var(--accent);
+    color: var(--accent-ink);
+    border: none;
+    border-radius: 9px;
+    padding: 10px 20px;
+    cursor: pointer;
+  }
+  .add-btn:hover { filter: brightness(1.08); }
+  .add-btn:focus-visible { outline: 2px solid var(--ink); outline-offset: 2px; }
+
+  .footer-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 12px;
+    margin-top: 18px;
+    flex-wrap: wrap;
+  }
+  .manage-toggle {
+    font: inherit;
+    font-size: 13px;
+    font-weight: 600;
+    background: none;
+    color: var(--muted);
+    border: 1px solid var(--line);
+    border-radius: 8px;
+    padding: 6px 14px;
+    cursor: pointer;
+  }
+  .manage-toggle.on { border-color: var(--accent); color: var(--accent); }
+
+  @media (prefers-reduced-motion: reduce) {
+    .task, .progress-fill { transition: none; }
+  }
+</style>
+</head>
+<body>
+
+<div class="wrap">
+  <p class="eyebrow">Monthly Musts</p>
+  <div class="masthead">
+    <h1 class="month-name" id="monthName">&nbsp;</h1>
+    <div class="month-nav">
+      <button id="prevMonth" aria-label="Previous month">&lsaquo;</button>
+      <button id="nextMonth" aria-label="Next month">&rsaquo;</button>
+      <button class="today-link" id="todayLink" hidden>back to this month</button>
+    </div>
+  </div>
+  <div class="progress-row">
+    <div class="progress-track"><div class="progress-fill" id="progressFill"></div></div>
+    <span class="progress-label" id="progressLabel">&nbsp;</span>
+    <div class="view-seg" id="viewSeg" role="group" aria-label="View">
+      <button data-view="board" class="sel">Board</button>
+      <button data-view="calendar">Calendar</button>
+    </div>
+  </div>
+  <p class="note warn" id="syncNote" hidden>Can't reach the shared board right now — changes here are saved only on this device.</p>
+  <p class="note" id="exampleNote" hidden>The board starts with example tasks — turn on Manage below to rename or delete them.</p>
+
+  <div class="tabs" id="tabBar"></div>
+  <div class="people-summary" id="peopleSummary" hidden></div>
+
+  <div id="calView" hidden>
+    <div class="cal-grid" id="calGrid"></div>
+    <div class="cal-anytime" id="calAnytime"></div>
+  </div>
+
+  <section class="tier" id="tier3">
+    <div class="tier-head">
+      <h2 class="tier-label">The Big Ones</h2>
+      <span class="tier-count" id="count3"></span>
+    </div>
+    <div class="grid-3" id="grid3"></div>
+    <p class="tier-empty" id="empty3" hidden>Nothing big this month.</p>
+  </section>
+
+  <section class="tier" id="tier2">
+    <div class="tier-head">
+      <h2 class="tier-label">The Regulars</h2>
+      <span class="tier-count" id="count2"></span>
+    </div>
+    <div class="grid-2" id="grid2"></div>
+    <p class="tier-empty" id="empty2" hidden>No regular tasks this month.</p>
+  </section>
+
+  <section class="tier" id="tier1">
+    <div class="tier-head">
+      <h2 class="tier-label">Little Stuff</h2>
+      <span class="tier-count" id="count1"></span>
+    </div>
+    <div class="grid-1" id="grid1"></div>
+    <p class="tier-empty" id="empty1" hidden>No little stuff this month.</p>
+  </section>
+
+  <div class="add-panel">
+    <h2>Add something to the board</h2>
+    <div class="add-row">
+      <input class="add-name" id="addName" type="text" maxlength="120" placeholder="What needs doing?" aria-label="Task name">
+      <input class="add-name add-date" id="addDate" type="date" aria-label="First due date, optional">
+      <select class="add-name add-repeat" id="addRepeat" aria-label="How often it repeats">
+        <option value="none">One-time</option>
+        <option value="week-1">Every week</option>
+        <option value="week-2">Every 2 weeks</option>
+        <option value="month-1">Every month</option>
+        <option value="month-3">Every 3 months</option>
+      </select>
+      <div class="who-chips" id="addWho" role="group" aria-label="Assigned to (pick any number)" title="Who's on this? Pick none for Anyone" hidden></div>
+      <div class="seg" id="importanceSeg" role="group" aria-label="Importance">
+        <button class="s3 sel" data-imp="3">Big deal</button>
+        <button class="s2" data-imp="2">Regular</button>
+        <button class="s1" data-imp="1">Small</button>
+      </div>
+      <button class="add-btn" id="addBtn">Add it</button>
+    </div>
+  </div>
+
+  <div class="footer-row">
+    <p class="note">Big buttons are the big deals — click a task to check it off, click again to undo. ✎ adds a shared note (where are we on this?). A task with a checklist opens like a dropdown — check off each item and the task goes green when the list is done; add a checklist in Manage. The Calendar view lays the same month out by date.</p>
+    <span style="display:flex; gap:8px; align-items:center;">
+      <button class="mini-btn delete" id="removePersonBtn" hidden></button>
+      <button class="manage-toggle" id="manageToggle">Manage</button>
+    </span>
+  </div>
+</div>
+
+<script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore-compat.js"></script>
+<script>
+(() => {
+  "use strict";
+
+  const FIREBASE_CONFIG = {
+    apiKey: "AIzaSyCUSPVkENoSt-hvvnf7rj-rIzbeDgJl-jI",
+    authDomain: "to-do-tracker-c5abf.firebaseapp.com",
+    projectId: "to-do-tracker-c5abf",
+    storageBucket: "to-do-tracker-c5abf.firebasestorage.app",
+    messagingSenderId: "74622849258",
+    appId: "1:74622849258:web:ad060e3067387fa9768793",
+  };
+  // The board's data lives under this id in Firestore; ?board=<id> in the
+  // URL opens a different board on the same site.
+  const BOARD_ID = new URLSearchParams(location.search).get("board") || "mm-l7soqpj9haydug";
+
+  // ---------- month helpers ----------
+  const pad = n => String(n).padStart(2, "0");
+  const ymOf = d => d.getFullYear() + "-" + pad(d.getMonth() + 1);
+  const THIS_MONTH = ymOf(new Date());
+
+  function monthLabel(ym) {
+    const [y, m] = ym.split("-").map(Number);
+    return new Date(y, m - 1, 1).toLocaleString(undefined, { month: "long", year: "numeric" });
+  }
+  function shiftMonth(ym, delta) {
+    const [y, m] = ym.split("-").map(Number);
+    const d = new Date(y, m - 1 + delta, 1);
+    return ymOf(d);
+  }
+  function dayLabel(ts) {
+    try {
+      return new Date(ts).toLocaleDateString(undefined, { month: "short", day: "numeric" });
+    } catch { return ""; }
+  }
+  function daysInMonth(ym) {
+    const [y, m] = ym.split("-").map(Number);
+    return new Date(y, m, 0).getDate();
+  }
+  function ord(n) {
+    const s = ["th", "st", "nd", "rd"], v = n % 100;
+    return n + (s[(v - 20) % 10] || s[v] || s[0]);
+  }
+  const REPEAT_LABEL = {
+    "none": "One-time",
+    "week-1": "Every week",
+    "week-2": "Every 2 weeks",
+    "month-1": "Every month",
+    "month-3": "Every 3 months",
+  };
+  const REPEAT_BADGE = {
+    "week-1": "↻ weekly",
+    "week-2": "↻ every 2 weeks",
+    "month-1": "↻ monthly",
+    "month-3": "↻ every 3 months",
+  };
+  // Tasks written by the first version carried {recurring, dueDays}
+  // instead of {start, repeat} — map them onto the new schedule.
+  function normalizeTask(t) {
+    if (t.repeat !== undefined) return t;
+    const n = { ...t };
+    n.repeat = t.recurring ? "month-1" : "none";
+    if (typeof t.start !== "string") {
+      n.start = Array.isArray(t.dueDays) && t.dueDays.length
+        ? (t.month || THIS_MONTH) + "-" + pad(t.dueDays[0])
+        : null;
+    }
+    return n;
+  }
+  // The day numbers this task is due in month M — [] if it doesn't
+  // appear, [null] for an undated task that does.
+  function occDays(t, M) {
+    if (!t.start) {
+      if (t.repeat && t.repeat !== "none") return (t.month || "0000-00") <= M ? [null] : [];
+      return (t.month || THIS_MONTH) === M ? [null] : [];
+    }
+    const [sy, sm, sd] = t.start.split("-").map(Number);
+    const [y, m] = M.split("-").map(Number);
+    const dim = daysInMonth(M);
+    const rep = t.repeat || "none";
+    if (rep === "none") return (sy === y && sm === m) ? [Math.min(sd, dim)] : [];
+    if (rep === "month-1" || rep === "month-3") {
+      const diff = (y - sy) * 12 + (m - sm);
+      if (diff < 0 || (rep === "month-3" && diff % 3 !== 0)) return [];
+      return [Math.min(sd, dim)];
+    }
+    // week-based: walk forward from the start date in 7/14-day steps
+    const step = rep === "week-1" ? 7 : 14;
+    const first = new Date(y, m - 1, 1);
+    const d = new Date(sy, sm - 1, sd);
+    let guard = 0;
+    while (d < first && guard++ < 5000) d.setDate(d.getDate() + step);
+    const out = [];
+    while (d.getFullYear() === y && d.getMonth() === m - 1) {
+      out.push(d.getDate());
+      d.setDate(d.getDate() + step);
+    }
+    return out;
+  }
+  function okey(taskId, day) { return taskId + "|" + (day || 0); }
+  function checkDocId(taskId, month, day) {
+    return taskId + "_" + month + (day ? "_d" + day : "");
+  }
+  function slug(s) {
+    return String(s).toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-+|-+$/g, "").slice(0, 40) || "x";
+  }
+  function subsOf(t) {
+    return Array.isArray(t.subtasks) ? t.subtasks.filter(s => typeof s === "string" && s.trim()) : [];
+  }
+  // Tasks written before multi-assign carried a single `assignee` string.
+  function assigneesOf(t) {
+    if (Array.isArray(t.assignees)) return t.assignees.filter(a => typeof a === "string" && a);
+    return t.assignee ? [t.assignee] : [];
+  }
+  // Checks-map key for a check doc: parent checks by occurrence,
+  // checklist items by occurrence + item slug.
+  function checkKey(c) {
+    return c.sub ? okey(c.taskId, c.day) + "|" + c.sub : okey(c.taskId, c.day);
+  }
+  // An occurrence with a checklist is done when every item is checked.
+  function occDone(t, day) {
+    const subs = subsOf(t);
+    if (!subs.length) return !!state.checks[okey(t.id, day)];
+    return subs.every(s => state.checks[okey(t.id, day) + "|" + slug(s)]);
+  }
+  function isOverdue(day) {
+    if (!day) return false;
+    const [y, m] = state.month.split("-").map(Number);
+    const due = new Date(y, m - 1, Math.min(day, daysInMonth(state.month)));
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+    return due < today;
+  }
+
+  // ---------- state ----------
+  const state = {
+    month: THIS_MONTH,
+    tasks: [],        // {id, name, importance, month, start, repeat, assignee, example}
+    checks: {},       // okey(taskId, day) -> {at}
+    notes: {},        // okey(taskId, day) -> {text, at}
+    people: [],       // person tabs
+    person: null,     // null = the Everyone tab
+    view: "board",    // "board" | "calendar"
+    addWho: new Set(),   // people picked in the add form
+    expanded: new Set(), // open checklist dropdowns, keyed by okey
+    manage: false,
+    addImportance: 3,
+  };
+
+  // ---------- storage backends ----------
+  // Shared backend (artifact db) when available; localStorage fallback otherwise.
+  let backend = null;
+  let unsubChecks = null;
+  let unsubNotes = null;
+
+  function makeLocalBackend() {
+    const KEY = "monthly-musts-local";
+    let data = { tasks: [], checks: {}, people: [], notes: {} };
+    try {
+      const raw = localStorage.getItem(KEY);
+      if (raw) data = JSON.parse(raw);
+    } catch {}
+    data.people = data.people || [];
+    data.notes = data.notes || {};
+    const save = () => { try { localStorage.setItem(KEY, JSON.stringify(data)); } catch {} };
+    let onTasks = () => {}, onChecks = () => {}, onPeople = () => {}, onNotes = () => {};
+    let checksMonth = state.month, notesMonth = state.month;
+
+    const pushTasks = () => onTasks(data.tasks.slice());
+    const pushChecks = () => {
+      const out = {};
+      for (const k in data.checks) {
+        const c = data.checks[k];
+        if (c.month === checksMonth) out[checkKey(c)] = c;
+      }
+      onChecks(out);
+    };
+    const pushNotes = () => {
+      const out = {};
+      for (const k in data.notes) {
+        const n = data.notes[k];
+        if (n.month === notesMonth) out[okey(n.taskId, n.day)] = n;
+      }
+      onNotes(out);
+    };
+    return {
+      shared: false,
+      subTasks(cb) { onTasks = cb; pushTasks(); },
+      subChecks(month, cb) { checksMonth = month; onChecks = cb; pushChecks(); },
+      subPeople(cb) { onPeople = cb; onPeople((data.people || []).slice()); },
+      async setPeople(names) { data.people = names; save(); onPeople(names.slice()); },
+      subNotes(month, cb) { notesMonth = month; onNotes = cb; pushNotes(); },
+      async setNote(taskId, month, day, text) {
+        const id = checkDocId(taskId, month, day);
+        if (text) {
+          const n = { taskId, month, text, at: Date.now() };
+          if (day) n.day = day;
+          data.notes[id] = n;
+        } else delete data.notes[id];
+        save(); pushNotes();
+      },
+      async setSubCheck(taskId, month, day, sub) {
+        const c = { taskId, month, sub, at: Date.now() };
+        if (day) c.day = day;
+        data.checks[checkDocId(taskId, month, day) + "_s-" + sub] = c;
+        save(); pushChecks();
+      },
+      async clearSubCheck(taskId, month, day, sub) {
+        delete data.checks[checkDocId(taskId, month, day) + "_s-" + sub];
+        save(); pushChecks();
+      },
+      async addTask(t) {
+        data.tasks.push({ ...t, id: "t" + Date.now() + Math.random().toString(36).slice(2, 7) });
+        save(); pushTasks();
+      },
+      async updateTask(id, patch) {
+        const t = data.tasks.find(t => t.id === id);
+        if (t) Object.assign(t, patch);
+        save(); pushTasks();
+      },
+      async deleteTask(id) {
+        data.tasks = data.tasks.filter(t => t.id !== id);
+        for (const k in data.checks) if (data.checks[k].taskId === id) delete data.checks[k];
+        for (const k in data.notes) if (data.notes[k].taskId === id) delete data.notes[k];
+        save(); pushTasks(); pushChecks(); pushNotes();
+      },
+      async setCheck(taskId, month, day) {
+        const c = { taskId, month, at: Date.now() };
+        if (day) c.day = day;
+        data.checks[checkDocId(taskId, month, day)] = c;
+        save(); pushChecks();
+      },
+      async clearCheck(taskId, month, day) {
+        delete data.checks[checkDocId(taskId, month, day)];
+        save(); pushChecks();
+      },
+    };
+  }
+
+  function makeDbBackend(db) {
+    return {
+      shared: true,
+      subTasks(cb) {
+        db.collection("tasks").onSnapshot(
+          snap => cb(snap.docs.filter(d => d.exists).map(d => ({ id: d.id, ...d.data() }))),
+          err => console.error("tasks subscription", err)
+        );
+      },
+      subChecks(month, cb) {
+        if (unsubChecks) { unsubChecks(); unsubChecks = null; }
+        unsubChecks = db.collection("checks").where("month", "==", month).onSnapshot(
+          snap => {
+            const out = {};
+            for (const d of snap.docs) {
+              const c = d.data();
+              if (c && c.taskId) out[checkKey(c)] = c;
+            }
+            cb(out);
+          },
+          err => console.error("checks subscription", err)
+        );
+      },
+      subNotes(month, cb) {
+        if (unsubNotes) { unsubNotes(); unsubNotes = null; }
+        unsubNotes = db.collection("notes").where("month", "==", month).onSnapshot(
+          snap => {
+            const out = {};
+            for (const d of snap.docs) {
+              const n = d.data();
+              if (n && n.taskId) out[okey(n.taskId, n.day)] = n;
+            }
+            cb(out);
+          },
+          err => console.error("notes subscription", err)
+        );
+      },
+      setNote(taskId, month, day, text) {
+        const ref = db.doc("notes/" + checkDocId(taskId, month, day));
+        if (!text) return ref.delete();
+        const n = { taskId, month, text, at: Date.now() };
+        if (day) n.day = day;
+        return ref.set(n);
+      },
+      setSubCheck(taskId, month, day, sub) {
+        const c = { taskId, month, sub, at: Date.now() };
+        if (day) c.day = day;
+        return db.doc("checks/" + checkDocId(taskId, month, day) + "_s-" + sub).set(c);
+      },
+      clearSubCheck(taskId, month, day, sub) {
+        return db.doc("checks/" + checkDocId(taskId, month, day) + "_s-" + sub).delete();
+      },
+      subPeople(cb) {
+        db.doc("meta/people").onSnapshot(
+          snap => {
+            const d = snap.exists ? snap.data() : null;
+            cb(d && Array.isArray(d.names) ? d.names.filter(n => typeof n === "string") : []);
+          },
+          err => console.error("people subscription", err)
+        );
+      },
+      setPeople(names) { return db.doc("meta/people").set({ names }); },
+      addTask(t) { return db.collection("tasks").add(t); },
+      updateTask(id, patch) { return db.doc("tasks/" + id).update(patch); },
+      async deleteTask(id) {
+        await db.doc("tasks/" + id).delete();
+        // sweep this task's check and note docs so they don't linger against quota
+        for (const coll of ["checks", "notes"]) {
+          try {
+            const snap = await db.collection(coll).where("taskId", "==", id).get();
+            for (const d of snap.docs) await db.doc(coll + "/" + d.id).delete();
+          } catch {}
+        }
+      },
+      setCheck(taskId, month, day) {
+        const c = { taskId, month, at: Date.now() };
+        if (day) c.day = day;
+        return db.doc("checks/" + checkDocId(taskId, month, day)).set(c);
+      },
+      clearCheck(taskId, month, day) {
+        return db.doc("checks/" + checkDocId(taskId, month, day)).delete();
+      },
+    };
+  }
+
+  // ---------- rendering ----------
+  const $ = id => document.getElementById(id);
+  const grids = { 3: $("grid3"), 2: $("grid2"), 1: $("grid1") };
+  const IMP_LABEL = { 3: "Big deal", 2: "Regular", 1: "Small" };
+
+  // Every task appearing this month, with its occurrence days.
+  function visibleEntries() {
+    const out = [];
+    for (const raw of state.tasks) {
+      const t = normalizeTask(raw);
+      const days = occDays(t, state.month);
+      if (days.length) out.push({ t, days });
+    }
+    return out;
+  }
+
+  function statsFor(entries, person) {
+    let total = 0, done = 0, over = 0;
+    for (const e of entries) {
+      const as = assigneesOf(e.t);
+      if (person === null ? as.length > 0 : !as.includes(person)) continue;
+      for (const day of e.days) {
+        total++;
+        if (occDone(e.t, day)) done++;
+        else if (isOverdue(day)) over++;
+      }
+    }
+    return { total, done, over };
+  }
+
+  function setPerson(p) {
+    state.person = p;
+    state.addWho = new Set(p ? [p] : []);
+    updateWhoOptions();
+    render();
+  }
+
+  function updateWhoOptions() {
+    const wrap = $("addWho");
+    wrap.textContent = "";
+    wrap.hidden = !state.people.length;
+    for (const nm of [...state.addWho]) if (!state.people.includes(nm)) state.addWho.delete(nm);
+    for (const p of state.people) {
+      const b = document.createElement("button");
+      b.type = "button";
+      b.className = "who-chip" + (state.addWho.has(p) ? " sel" : "");
+      b.textContent = p;
+      b.setAttribute("aria-pressed", state.addWho.has(p) ? "true" : "false");
+      b.addEventListener("click", () => {
+        if (state.addWho.has(p)) state.addWho.delete(p);
+        else state.addWho.add(p);
+        updateWhoOptions();
+      });
+      wrap.appendChild(b);
+    }
+  }
+
+  function renderTabs() {
+    const bar = $("tabBar");
+    bar.textContent = "";
+    const mkTab = (label, val) => {
+      const b = document.createElement("button");
+      b.className = "tab" + (state.person === val ? " sel" : "");
+      b.textContent = label;
+      b.addEventListener("click", () => setPerson(val));
+      bar.appendChild(b);
+    };
+    mkTab("Everyone", null);
+    for (const p of state.people) mkTab(p, p);
+    const addP = document.createElement("button");
+    addP.className = "tab";
+    addP.textContent = "+ person";
+    addP.title = "Add a person tab";
+    addP.addEventListener("click", () => {
+      const input = document.createElement("input");
+      input.className = "mini-input";
+      input.placeholder = "Name, then Enter";
+      input.maxLength = 40;
+      input.setAttribute("aria-label", "New person's name");
+      input.style.alignSelf = "center";
+      let settled = false;
+      const commit = async () => {
+        if (settled) return;
+        settled = true;
+        const name = input.value.trim();
+        if (!name || !backend) { render(); return; }
+        if (!state.people.includes(name)) {
+          state.people = [...state.people, name];
+          try { await backend.setPeople(state.people); } catch {}
+        }
+        setPerson(name);
+      };
+      input.addEventListener("keydown", e => {
+        if (e.key === "Enter") commit();
+        if (e.key === "Escape") { settled = true; render(); }
+      });
+      input.addEventListener("blur", commit);
+      bar.replaceChild(input, addP);
+      input.focus();
+    });
+    bar.appendChild(addP);
+  }
+
+  function renderSummary(entries) {
+    const summary = $("peopleSummary");
+    summary.textContent = "";
+    const show = !state.person && state.people.length > 0;
+    summary.hidden = !show;
+    if (!show) return;
+    const groups = [...state.people];
+    if (entries.some(e => assigneesOf(e.t).length === 0)) groups.push(null);
+    for (const p of groups) {
+      const s = statsFor(entries, p);
+      const card = document.createElement("div");
+      card.className = "person-card";
+      card.title = p ? "Open " + p + "'s tab" : "Tasks anyone can grab";
+      const nm = document.createElement("div");
+      nm.className = "p-name";
+      nm.textContent = p || "Anyone";
+      const st = document.createElement("div");
+      st.className = "p-stat";
+      st.textContent = s.total ? s.done + " of " + s.total + " done" : "nothing this month";
+      if (s.over) {
+        st.appendChild(document.createTextNode(" · "));
+        const ov = document.createElement("span");
+        ov.className = "p-overdue";
+        ov.textContent = s.over + " overdue";
+        st.appendChild(ov);
+      }
+      const track = document.createElement("div");
+      track.className = "p-track";
+      const fill = document.createElement("div");
+      fill.className = "p-fill";
+      fill.style.width = s.total ? (100 * s.done / s.total) + "%" : "0%";
+      track.appendChild(fill);
+      card.append(nm, st, track);
+      if (p) card.addEventListener("click", () => setPerson(p));
+      summary.appendChild(card);
+    }
+  }
+
+  function render() {
+    $("monthName").textContent = monthLabel(state.month);
+    $("todayLink").hidden = state.month === THIS_MONTH;
+    $("exampleNote").hidden = !state.tasks.some(t => t.example);
+    $("manageToggle").classList.toggle("on", state.manage);
+    $("manageToggle").textContent = state.manage ? "Done managing" : "Manage";
+    const rp = $("removePersonBtn");
+    rp.hidden = !(state.manage && state.person);
+    if (!rp.hidden) rp.textContent = "Remove " + state.person + " from the board";
+
+    renderTabs();
+    const all = visibleEntries();
+    renderSummary(all);
+    const entries = state.person
+      ? all.filter(e => assigneesOf(e.t).includes(state.person))
+      : all;
+    let doneCount = 0, total = 0;
+
+    const calMode = state.view === "calendar" && !state.manage;
+    for (const b of $("viewSeg").querySelectorAll("button")) {
+      b.classList.toggle("sel", b.dataset.view === state.view);
+    }
+    $("calView").hidden = !calMode;
+    for (const imp of [3, 2, 1]) $("tier" + imp).hidden = calMode;
+    if (calMode) renderCalendar(entries);
+
+    for (const imp of [3, 2, 1]) {
+      const grid = grids[imp];
+      grid.textContent = "";
+      const tierEntries = entries.filter(e => (e.t.importance || 2) === imp);
+      // one occurrence (one check button) per due day; [null] = undated
+      const occs = [];
+      for (const e of tierEntries) for (const day of e.days) occs.push({ t: e.t, day });
+      // undone first, then by due day (undated last), then name
+      occs.sort((a, b) => {
+        const ca = occDone(a.t, a.day) ? 1 : 0;
+        const cb = occDone(b.t, b.day) ? 1 : 0;
+        if (ca !== cb) return ca - cb;
+        if ((a.day || 99) !== (b.day || 99)) return (a.day || 99) - (b.day || 99);
+        return String(a.t.name).localeCompare(String(b.t.name));
+      });
+      const done = occs.filter(o => occDone(o.t, o.day)).length;
+      doneCount += done;
+      total += occs.length;
+      $("count" + imp).textContent = occs.length ? done + " of " + occs.length + " done" : "";
+      $("empty" + imp).hidden = tierEntries.length > 0;
+      if (state.manage) {
+        // manage mode edits the task itself, so one tile per task
+        const tasks = tierEntries.map(e => e.t)
+          .sort((a, b) => String(a.name).localeCompare(String(b.name)));
+        for (const t of tasks) grid.appendChild(taskTile(t, imp, null));
+      } else {
+        for (const o of occs) grid.appendChild(taskTile(o.t, imp, o.day));
+      }
+    }
+    $("progressLabel").textContent = total
+      ? doneCount + " of " + total + " done"
+      : "nothing on the board yet";
+    $("progressFill").style.width = total ? (100 * doneCount / total) + "%" : "0%";
+  }
+
+  // Check or un-check a whole occurrence (checklist tasks toggle every item).
+  function toggleOcc(t, day) {
+    if (!backend) return;
+    const subs = subsOf(t);
+    if (!subs.length) {
+      if (state.checks[okey(t.id, day)]) backend.clearCheck(t.id, state.month, day);
+      else backend.setCheck(t.id, state.month, day);
+      return;
+    }
+    const allDone = occDone(t, day);
+    for (const s of subs) {
+      const sl = slug(s);
+      const k = okey(t.id, day) + "|" + sl;
+      if (allDone && state.checks[k]) backend.clearSubCheck(t.id, state.month, day, sl);
+      else if (!allDone && !state.checks[k]) backend.setSubCheck(t.id, state.month, day, sl);
+    }
+  }
+
+  function calItem(t, day) {
+    const done = occDone(t, day);
+    const over = !done && isOverdue(day);
+    const b = document.createElement("button");
+    b.type = "button";
+    b.className = "cal-item i" + (t.importance || 2) + (done ? " done" : "") + (over ? " over" : "");
+    const asg = assigneesOf(t);
+    b.textContent = (done ? "✓ " : "") + t.name
+      + (!state.person && asg.length ? " · " + asg.join(", ") : "");
+    const subs = subsOf(t);
+    b.title = subs.length
+      ? (done ? "Un-checks" : "Checks off") + " all " + subs.length + " items — open the Board view to check them one by one"
+      : (done ? "Click to un-check" : "Click to check off");
+    b.addEventListener("click", () => toggleOcc(t, day));
+    return b;
+  }
+
+  function renderCalendar(entries) {
+    const grid = $("calGrid");
+    grid.textContent = "";
+    const [y, m] = state.month.split("-").map(Number);
+    const dim = daysInMonth(state.month);
+    const today = new Date();
+    const isThisMonth = state.month === THIS_MONTH;
+    for (const d of ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"]) {
+      const h = document.createElement("div");
+      h.className = "cal-dow";
+      h.textContent = d;
+      grid.appendChild(h);
+    }
+    for (let i = 0; i < new Date(y, m - 1, 1).getDay(); i++) {
+      const b = document.createElement("div");
+      b.className = "cal-cell blank";
+      grid.appendChild(b);
+    }
+    const byDay = new Map(), anytime = [];
+    for (const e of entries) for (const day of e.days) {
+      if (day) {
+        const d = Math.min(day, dim);
+        if (!byDay.has(d)) byDay.set(d, []);
+        byDay.get(d).push(e.t);
+      } else anytime.push(e.t);
+    }
+    for (let d = 1; d <= dim; d++) {
+      const cell = document.createElement("div");
+      cell.className = "cal-cell" + (isThisMonth && d === today.getDate() ? " today" : "");
+      const num = document.createElement("div");
+      num.className = "cal-num";
+      num.textContent = d;
+      cell.appendChild(num);
+      const items = (byDay.get(d) || []).sort((a, b) => (b.importance || 2) - (a.importance || 2));
+      for (const t of items) cell.appendChild(calItem(t, d));
+      grid.appendChild(cell);
+    }
+    const anyWrap = $("calAnytime");
+    anyWrap.textContent = "";
+    if (anytime.length) {
+      const h = document.createElement("h3");
+      h.textContent = "Anytime this month";
+      anyWrap.appendChild(h);
+      const row = document.createElement("div");
+      row.className = "cal-row";
+      anytime.sort((a, b) => (b.importance || 2) - (a.importance || 2));
+      for (const t of anytime) row.appendChild(calItem(t, null));
+      anyWrap.appendChild(row);
+    }
+  }
+
+  function taskTile(t, imp, day) {
+    const subs = state.manage ? [] : subsOf(t);
+    const done = !state.manage && occDone(t, day);
+    const check = !state.manage && !subs.length ? state.checks[okey(t.id, day)] : null;
+    const overdue = !state.manage && !done && isOverdue(day);
+    const el = document.createElement("div");
+    el.className = "task t" + imp + (done ? " done" : "") + (overdue ? " overdue" : "") + (state.manage ? " managing" : "");
+    if (!state.manage) {
+      el.setAttribute("role", "button");
+      el.tabIndex = 0;
+      if (subs.length) el.setAttribute("aria-expanded", state.expanded.has(okey(t.id, day)) ? "true" : "false");
+      else el.setAttribute("aria-pressed", done ? "true" : "false");
+    }
+
+    const name = document.createElement("span");
+    name.className = "task-name";
+    name.textContent = t.name;
+
+    const meta = document.createElement("span");
+    meta.className = "task-meta";
+    const mark = document.createElement("span");
+    mark.className = "checkmark";
+    mark.textContent = done ? (check ? "✓ done " + dayLabel(check.at) : "✓ done") : "✓";
+    meta.appendChild(mark);
+    if (day && !done) {
+      const [y, m] = state.month.split("-").map(Number);
+      const dateTxt = new Date(y, m - 1, Math.min(day, daysInMonth(state.month)))
+        .toLocaleDateString(undefined, { month: "short", day: "numeric" });
+      const due = document.createElement("span");
+      due.className = "due-label" + (overdue ? " overdue" : "");
+      due.textContent = (overdue ? "overdue — was due " : "due ") + dateTxt;
+      meta.appendChild(due);
+    }
+    if (subs.length) {
+      const ndone = subs.filter(s => state.checks[okey(t.id, day) + "|" + slug(s)]).length;
+      const prog = document.createElement("span");
+      prog.textContent = ndone + " of " + subs.length;
+      meta.appendChild(prog);
+    }
+    const badge = REPEAT_BADGE[t.repeat];
+    if (badge) {
+      const rec = document.createElement("span");
+      rec.className = "badge-recurring";
+      rec.title = REPEAT_LABEL[t.repeat];
+      rec.textContent = badge;
+      meta.appendChild(rec);
+    }
+    const asg = assigneesOf(t);
+    if (!state.person && asg.length && !state.manage) {
+      const who = document.createElement("span");
+      who.textContent = "· " + asg.join(", ");
+      meta.appendChild(who);
+    }
+
+    el.appendChild(name);
+
+    // shared note for this occurrence: shown under the name, edited in place
+    const noteRec = state.notes[okey(t.id, day)];
+    let noteDisplay = null;
+    if (!state.manage) {
+      const openNoteEditor = () => {
+        if (el.querySelector(".note-edit")) return;
+        const ta = document.createElement("textarea");
+        ta.className = "note-edit no-toggle";
+        ta.value = (noteRec && noteRec.text) || "";
+        ta.placeholder = "Where are we on this?";
+        ta.setAttribute("aria-label", "Note for " + t.name);
+        let settled = false;
+        const commit = async () => {
+          if (settled) return;
+          settled = true;
+          const v = ta.value.trim();
+          if (((noteRec && noteRec.text) || "") === v) { render(); return; }
+          try { await backend.setNote(t.id, state.month, day, v); } catch {}
+          render();
+        };
+        ta.addEventListener("keydown", e => {
+          e.stopPropagation();
+          if (e.key === "Escape") { settled = true; render(); }
+        });
+        ta.addEventListener("click", e => e.stopPropagation());
+        ta.addEventListener("blur", commit);
+        if (noteDisplay) noteDisplay.replaceWith(ta); else name.after(ta);
+        ta.focus();
+      };
+      if (noteRec && noteRec.text) {
+        noteDisplay = document.createElement("p");
+        noteDisplay.className = "task-note no-toggle";
+        noteDisplay.textContent = noteRec.text;
+        noteDisplay.title = "Click to edit the note";
+        noteDisplay.addEventListener("click", e => { e.stopPropagation(); openNoteEditor(); });
+        el.appendChild(noteDisplay);
+      }
+      const noteBtn = document.createElement("button");
+      noteBtn.type = "button";
+      noteBtn.className = "note-btn no-toggle";
+      noteBtn.textContent = "✎" + (noteRec && noteRec.text ? "" : " note");
+      noteBtn.title = noteRec && noteRec.text ? "Edit the note" : "Add a note — where are we on this?";
+      noteBtn.addEventListener("click", e => { e.stopPropagation(); openNoteEditor(); });
+      meta.appendChild(noteBtn);
+      if (subs.length) {
+        const chev = document.createElement("span");
+        chev.className = "chev";
+        chev.textContent = state.expanded.has(okey(t.id, day)) ? "▲" : "▼";
+        meta.appendChild(chev);
+      }
+    }
+
+    // open checklist dropdown
+    if (subs.length && state.expanded.has(okey(t.id, day))) {
+      const list = document.createElement("div");
+      list.className = "sub-list no-toggle";
+      for (const s of subs) {
+        const k = okey(t.id, day) + "|" + slug(s);
+        const c = state.checks[k];
+        const row = document.createElement("button");
+        row.type = "button";
+        row.className = "sub-row" + (c ? " done" : "");
+        const box = document.createElement("span");
+        box.className = "sub-box";
+        box.textContent = c ? "✓" : "";
+        const nm = document.createElement("span");
+        nm.className = "sub-name";
+        nm.textContent = s;
+        row.append(box, nm);
+        row.addEventListener("click", e => {
+          e.stopPropagation();
+          if (!backend) return;
+          if (c) backend.clearSubCheck(t.id, state.month, day, slug(s));
+          else backend.setSubCheck(t.id, state.month, day, slug(s));
+        });
+        list.appendChild(row);
+      }
+      el.appendChild(list);
+    }
+
+    el.appendChild(meta);
+
+    if (state.manage) {
+      name.title = "Click to rename";
+      name.addEventListener("click", () => {
+        const input = document.createElement("input");
+        input.className = "mini-input";
+        input.value = t.name;
+        input.maxLength = 120;
+        input.setAttribute("aria-label", "Task name");
+        input.style.width = "100%";
+        let settled = false;
+        const commit = async () => {
+          if (settled) return;
+          settled = true;
+          const v = input.value.trim();
+          if (v && v !== t.name) await backend.updateTask(t.id, { name: v, example: false });
+          else render();
+        };
+        input.addEventListener("keydown", e => {
+          if (e.key === "Enter") commit();
+          if (e.key === "Escape") { settled = true; render(); }
+        });
+        input.addEventListener("blur", commit);
+        el.replaceChild(input, name);
+        input.focus();
+        input.select();
+      });
+      const controls = document.createElement("span");
+      controls.className = "manage-controls";
+
+      const sizeBtn = document.createElement("button");
+      sizeBtn.className = "mini-btn";
+      sizeBtn.textContent = "Size: " + IMP_LABEL[imp];
+      sizeBtn.title = "Change importance";
+      sizeBtn.addEventListener("click", () => {
+        const next = imp === 3 ? 2 : imp === 2 ? 1 : 3;
+        backend.updateTask(t.id, { importance: next });
+      });
+
+      const dateInput = document.createElement("input");
+      dateInput.type = "date";
+      dateInput.className = "mini-input";
+      dateInput.value = t.start || "";
+      dateInput.title = "First due date (blank = no date)";
+      dateInput.addEventListener("change", () => {
+        backend.updateTask(t.id, {
+          start: dateInput.value || null,
+          repeat: t.repeat || "none",
+          month: t.month || state.month,
+        });
+      });
+
+      const repSel = document.createElement("select");
+      repSel.className = "mini-input";
+      for (const [val, label] of Object.entries(REPEAT_LABEL)) {
+        const o = document.createElement("option");
+        o.value = val;
+        o.textContent = label;
+        repSel.appendChild(o);
+      }
+      repSel.value = REPEAT_LABEL[t.repeat] ? t.repeat : "none";
+      repSel.title = "How often it repeats";
+      repSel.addEventListener("change", () => {
+        backend.updateTask(t.id, {
+          repeat: repSel.value,
+          start: t.start || null,
+          month: t.month || state.month,
+        });
+      });
+
+      const whoChips = [];
+      const current = assigneesOf(t);
+      for (const p of state.people) {
+        const chip = document.createElement("button");
+        chip.type = "button";
+        chip.className = "who-chip small" + (current.includes(p) ? " sel" : "");
+        chip.textContent = p;
+        chip.title = current.includes(p) ? "Take " + p + " off this task" : "Put " + p + " on this task";
+        chip.addEventListener("click", () => {
+          const next = current.includes(p) ? current.filter(x => x !== p) : [...current, p];
+          backend.updateTask(t.id, { assignees: next, assignee: null });
+        });
+        whoChips.push(chip);
+      }
+
+      const listBtn = document.createElement("button");
+      listBtn.className = "mini-btn";
+      const nSubs = subsOf(t).length;
+      listBtn.textContent = nSubs ? "Checklist (" + nSubs + ")" : "Add checklist";
+      listBtn.title = "Items checked off inside this task — like one per store location";
+      listBtn.addEventListener("click", () => {
+        if (el.querySelector(".note-edit")) return;
+        const ta = document.createElement("textarea");
+        ta.className = "note-edit";
+        ta.value = subsOf(t).join("\n");
+        ta.placeholder = "One item per line — e.g. one line per store location.\nLeave empty for no checklist.";
+        ta.setAttribute("aria-label", "Checklist items for " + t.name);
+        ta.style.minHeight = "80px";
+        let settled = false;
+        const commit = async () => {
+          if (settled) return;
+          settled = true;
+          const items = ta.value.split("\n").map(s => s.trim()).filter(Boolean).slice(0, 30);
+          await backend.updateTask(t.id, { subtasks: items });
+        };
+        ta.addEventListener("keydown", e => {
+          if (e.key === "Escape") { settled = true; render(); }
+        });
+        ta.addEventListener("blur", commit);
+        el.appendChild(ta);
+        ta.focus();
+      });
+
+      const delBtn = document.createElement("button");
+      delBtn.className = "mini-btn delete";
+      delBtn.textContent = "Delete";
+      delBtn.title = "Removes it from every month";
+      let armed = false;
+      delBtn.addEventListener("click", () => {
+        if (!armed) {
+          armed = true;
+          delBtn.textContent = "Really delete?";
+          setTimeout(() => { armed = false; delBtn.textContent = "Delete"; }, 3000);
+          return;
+        }
+        backend.deleteTask(t.id);
+      });
+
+      controls.append(sizeBtn, dateInput, repSel, ...whoChips, listBtn, delBtn);
+      el.appendChild(controls);
+    } else {
+      el.addEventListener("click", e => {
+        if (e.target.closest(".no-toggle")) return;
+        if (subs.length) {
+          const k = okey(t.id, day);
+          if (state.expanded.has(k)) state.expanded.delete(k);
+          else state.expanded.add(k);
+          render();
+          return;
+        }
+        toggleOcc(t, day);
+      });
+      el.addEventListener("keydown", e => {
+        if ((e.key === "Enter" || e.key === " ") && e.target === el) {
+          e.preventDefault();
+          el.click();
+        }
+      });
+    }
+    return el;
+  }
+
+  // ---------- wiring ----------
+  function setMonth(m) {
+    state.month = m;
+    state.checks = {};
+    state.notes = {};
+    state.expanded.clear();
+    if (backend) {
+      backend.subChecks(m, checks => { state.checks = checks; render(); });
+      backend.subNotes(m, notes => { state.notes = notes; render(); });
+    }
+    render();
+  }
+
+  $("viewSeg").addEventListener("click", e => {
+    const b = e.target.closest("button[data-view]");
+    if (!b) return;
+    state.view = b.dataset.view;
+    render();
+  });
+
+  $("prevMonth").addEventListener("click", () => setMonth(shiftMonth(state.month, -1)));
+  $("nextMonth").addEventListener("click", () => setMonth(shiftMonth(state.month, 1)));
+  $("todayLink").addEventListener("click", () => setMonth(THIS_MONTH));
+  $("manageToggle").addEventListener("click", () => { state.manage = !state.manage; render(); });
+
+  $("importanceSeg").addEventListener("click", e => {
+    const btn = e.target.closest("button[data-imp]");
+    if (!btn) return;
+    state.addImportance = Number(btn.dataset.imp);
+    for (const b of $("importanceSeg").querySelectorAll("button")) {
+      b.classList.toggle("sel", b === btn);
+    }
+  });
+
+  let removeArmed = false, removeTimer = 0;
+  $("removePersonBtn").addEventListener("click", async () => {
+    const p = state.person;
+    if (!p || !backend) return;
+    if (!removeArmed) {
+      removeArmed = true;
+      $("removePersonBtn").textContent = "Really remove " + p + "? Their tasks go to Anyone";
+      clearTimeout(removeTimer);
+      removeTimer = setTimeout(() => { removeArmed = false; render(); }, 4000);
+      return;
+    }
+    removeArmed = false;
+    clearTimeout(removeTimer);
+    for (const t of state.tasks) {
+      const as = assigneesOf(t);
+      if (as.includes(p)) {
+        try { await backend.updateTask(t.id, { assignees: as.filter(x => x !== p), assignee: null }); } catch {}
+      }
+    }
+    state.people = state.people.filter(x => x !== p);
+    try { await backend.setPeople(state.people); } catch {}
+    setPerson(null);
+  });
+
+  async function addTask() {
+    const name = $("addName").value.trim();
+    if (!name || !backend) return;
+    $("addName").value = "";
+    try {
+      await backend.addTask({
+        name,
+        importance: state.addImportance,
+        start: $("addDate").value || null,
+        repeat: $("addRepeat").value,
+        assignees: [...state.addWho],
+        month: state.month,
+        created: Date.now(),
+      });
+    } catch (e) {
+      alert(e && e.code === "quota_exceeded"
+        ? "The board is full — delete some old tasks first."
+        : "Couldn't add that task. Try again in a moment.");
+    }
+    $("addName").focus();
+  }
+  $("addBtn").addEventListener("click", addTask);
+  $("addName").addEventListener("keydown", e => { if (e.key === "Enter") addTask(); });
+
+  // ---------- boot ----------
+  $("addDate").value = THIS_MONTH + "-" + pad(new Date().getDate());
+  updateWhoOptions();
+  render();
+  (async () => {
+    let fsdb = null;
+    try {
+      firebase.initializeApp(FIREBASE_CONFIG);
+      await firebase.auth().signInAnonymously();
+      fsdb = firebase.firestore();
+    } catch (e) {
+      console.error("firebase init failed", e);
+    }
+    if (fsdb) {
+      // Same doc/collection surface the app was written against,
+      // rooted under this board's path.
+      backend = makeDbBackend({
+        doc: p => fsdb.doc("boards/" + BOARD_ID + "/" + p),
+        collection: p => fsdb.collection("boards/" + BOARD_ID + "/" + p),
+      });
+    } else {
+      backend = makeLocalBackend();
+      $("syncNote").hidden = false;
+    }
+    backend.subTasks(tasks => { state.tasks = tasks; render(); });
+    backend.subChecks(state.month, checks => { state.checks = checks; render(); });
+    backend.subNotes(state.month, notes => { state.notes = notes; render(); });
+    backend.subPeople(people => {
+      state.people = people;
+      if (state.person && !people.includes(state.person)) state.person = null;
+      updateWhoOptions();
+      render();
+    });
+  })();
+})();
+</script>
+</body>
+</html>

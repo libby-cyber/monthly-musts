@@ -1,0 +1,7 @@
+{
+  "name": "monthly-musts",
+  "private": true,
+  "dependencies": {
+    "@anthropic-ai/sdk": "^1"
+  }
+}

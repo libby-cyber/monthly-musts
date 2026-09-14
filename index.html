@@ -221,6 +221,9 @@
   .due-label { font-weight: 600; }
   .due-label.overdue { color: var(--danger); }
   .task.overdue, .task.overdue:hover { border-color: var(--danger); }
+  .task.dragging { opacity: 0.45; }
+  .tier.drop-ok { outline: 2px dashed var(--accent); outline-offset: 8px; border-radius: 8px; }
+  .mini-btn.delete.armed { background: var(--danger); color: #FFFFFF; border-color: var(--danger); }
 
   /* ---------- notes & checklists ---------- */
   .task.t1 { flex-wrap: wrap; }
@@ -578,6 +581,7 @@
       <button data-view="board" class="sel">Board</button>
       <button data-view="calendar">Calendar</button>
     </div>
+    <button class="manage-toggle" id="manageToggle">Manage</button>
   </div>
   <p class="note warn" id="syncNote" hidden>Can't reach the shared board right now — changes here are saved only on this device.</p>
   <p class="note" id="exampleNote" hidden>The board starts with example tasks — turn on Manage below to rename or delete them.</p>
@@ -640,11 +644,8 @@
   </div>
 
   <div class="footer-row">
-    <p class="note">Big buttons are the big deals — click a task to check it off, click again to undo. ✎ adds a shared note (where are we on this?). A task with a checklist opens like a dropdown — check off each item and the task goes green when the list is done; add a checklist in Manage. A task with no date and no repeat just stays on the board, month after month, until it's done. The Calendar view lays the same month out by date.</p>
-    <span style="display:flex; gap:8px; align-items:center;">
-      <button class="mini-btn delete" id="removePersonBtn" hidden></button>
-      <button class="manage-toggle" id="manageToggle">Manage</button>
-    </span>
+    <p class="note">Big buttons are the big deals — click a task to check it off, click again to undo. Drag a task into another section to change how big a deal it is. ✎ adds a shared note (where are we on this?). A task with a checklist opens like a dropdown — check off each item and it goes green when the list is done. Manage (up top) is where you rename, reschedule, reassign, add checklists, and delete. A task with no date and no repeat stays on the board until it's done.</p>
+    <button class="mini-btn delete" id="removePersonBtn" hidden></button>
   </div>
 </div>
 
@@ -807,6 +808,7 @@
   // ---------- storage backends ----------
   // Shared backend (artifact db) when available; localStorage fallback otherwise.
   let backend = null;
+  let dragTaskId = null;
   let unsubChecks = null;
   let unsubNotes = null;
 
@@ -1363,6 +1365,7 @@
         });
         ta.addEventListener("click", e => e.stopPropagation());
         ta.addEventListener("blur", commit);
+        el.draggable = false; // so text selection in the note works
         if (noteDisplay) noteDisplay.replaceWith(ta); else name.after(ta);
         ta.focus();
       };
@@ -1545,8 +1548,9 @@
       delBtn.addEventListener("click", () => {
         if (!armed) {
           armed = true;
-          delBtn.textContent = "Really delete?";
-          setTimeout(() => { armed = false; delBtn.textContent = "Delete"; }, 3000);
+          delBtn.textContent = "Click again to delete";
+          delBtn.classList.add("armed");
+          setTimeout(() => { armed = false; delBtn.textContent = "Delete"; delBtn.classList.remove("armed"); }, 4000);
           return;
         }
         backend.deleteTask(t.id);
@@ -1555,6 +1559,20 @@
       controls.append(sizeBtn, dateInput, repSel, ...whoChips, listBtn, delBtn);
       el.appendChild(controls);
     } else {
+      el.draggable = true;
+      el.addEventListener("dragstart", e => {
+        dragTaskId = t.id;
+        el.classList.add("dragging");
+        try {
+          e.dataTransfer.setData("text/plain", t.id);
+          e.dataTransfer.effectAllowed = "move";
+        } catch {}
+      });
+      el.addEventListener("dragend", () => {
+        dragTaskId = null;
+        el.classList.remove("dragging");
+        for (const s of document.querySelectorAll(".tier.drop-ok")) s.classList.remove("drop-ok");
+      });
       el.addEventListener("click", e => {
         if (e.target.closest(".no-toggle")) return;
         if (subs.length) {
@@ -1595,6 +1613,28 @@
     state.view = b.dataset.view;
     render();
   });
+
+  // drop a task onto a tier to change its importance
+  for (const imp of [3, 2, 1]) {
+    const sec = $("tier" + imp);
+    sec.addEventListener("dragover", e => {
+      if (!dragTaskId) return;
+      e.preventDefault();
+      e.dataTransfer.dropEffect = "move";
+      sec.classList.add("drop-ok");
+    });
+    sec.addEventListener("dragleave", e => {
+      if (!sec.contains(e.relatedTarget)) sec.classList.remove("drop-ok");
+    });
+    sec.addEventListener("drop", e => {
+      e.preventDefault();
+      sec.classList.remove("drop-ok");
+      const id = dragTaskId || e.dataTransfer.getData("text/plain");
+      dragTaskId = null;
+      const t = state.tasks.find(x => x.id === id);
+      if (t && backend && (t.importance || 2) !== imp) backend.updateTask(id, { importance: imp });
+    });
+  }
 
   $("prevMonth").addEventListener("click", () => setMonth(shiftMonth(state.month, -1)));
   $("nextMonth").addEventListener("click", () => setMonth(shiftMonth(state.month, 1)));

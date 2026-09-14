@@ -289,6 +289,18 @@
   }
   .sub-row.done .sub-box { border-color: var(--done); background: var(--done-wash); }
   .sub-row.done .sub-name { color: var(--muted); text-decoration: line-through; }
+  .sub-add {
+    font: inherit;
+    font-size: 13px;
+    background: none;
+    border: none;
+    border-top: 1px dashed var(--line);
+    color: var(--ink);
+    padding: 6px 2px 2px 25px;
+    margin-top: 2px;
+  }
+  .sub-add::placeholder { color: var(--muted); }
+  .sub-add:focus-visible { outline: 2px solid var(--accent); outline-offset: 1px; border-radius: 6px; }
   .chev { font-size: 10px; color: var(--muted); }
 
   /* ---------- calendar view ---------- */
@@ -646,7 +658,7 @@
   </div>
 
   <div class="footer-row">
-    <p class="note">Big buttons are the big deals — click a task to check it off, click again to undo. Drag a task into another section to change how big a deal it is. ✎ adds a shared note (where are we on this?). A task with a checklist opens like a dropdown — check off each item and it goes green when the list is done. Manage (up top) is where you rename, reschedule, reassign, add checklists, and delete. A task with no date and no repeat stays on the board until it's done.</p>
+    <p class="note">Big buttons are the big deals — click a task to check it off, click again to undo. Drag a task into another section to change how big a deal it is. ✎ adds a shared note (where are we on this?). ☑ list starts a checklist inside a task — it opens like a dropdown, you can add items right in the open list, and the task goes green when every item is checked. Manage (up top) is where you rename, reschedule, reassign, add checklists, and delete. A task with no date and no repeat stays on the board until it's done.</p>
     <button class="mini-btn delete" id="removePersonBtn" hidden></button>
   </div>
 </div>
@@ -802,6 +814,7 @@
     person: null,     // null = the Everyone tab
     view: "board",    // "board" | "calendar"
     addWho: new Set(),   // people picked in the add form
+    focusAddFor: null,   // refocus the "+ add item" input after a render
     expanded: new Set(), // open checklist dropdowns, keyed by okey
     manage: false,
     addImportance: 3,
@@ -1391,6 +1404,40 @@
         chev.className = "chev";
         chev.textContent = state.expanded.has(okey(t.id, day)) ? "▲" : "▼";
         meta.appendChild(chev);
+      } else {
+        // start a checklist right from the tile, no Manage needed
+        const listBtn = document.createElement("button");
+        listBtn.type = "button";
+        listBtn.className = "note-btn no-toggle";
+        listBtn.textContent = "☑ list";
+        listBtn.title = "Add a checklist inside this task — one item per line";
+        listBtn.addEventListener("click", e => {
+          e.stopPropagation();
+          if (el.querySelector(".note-edit")) return;
+          const ta = document.createElement("textarea");
+          ta.className = "note-edit no-toggle";
+          ta.placeholder = "One checklist item per line";
+          ta.setAttribute("aria-label", "Checklist items for " + t.name);
+          let settled = false;
+          const commit = async () => {
+            if (settled) return;
+            settled = true;
+            const items = ta.value.split("\n").map(s => s.trim()).filter(Boolean).slice(0, 30);
+            if (!items.length) { render(); return; }
+            state.expanded.add(okey(t.id, day));
+            try { await backend.updateTask(t.id, { subtasks: items }); } catch {}
+          };
+          ta.addEventListener("keydown", ev => {
+            ev.stopPropagation();
+            if (ev.key === "Escape") { settled = true; render(); }
+          });
+          ta.addEventListener("click", ev => ev.stopPropagation());
+          ta.addEventListener("blur", commit);
+          el.draggable = false;
+          name.after(ta);
+          ta.focus();
+        });
+        meta.appendChild(listBtn);
       }
     }
 
@@ -1424,6 +1471,29 @@
           }
         });
         list.appendChild(row);
+      }
+      const addRow = document.createElement("input");
+      addRow.className = "sub-add no-toggle";
+      addRow.placeholder = "+ add item";
+      addRow.maxLength = 80;
+      addRow.setAttribute("aria-label", "Add a checklist item");
+      addRow.addEventListener("click", e => e.stopPropagation());
+      addRow.addEventListener("focus", () => { el.draggable = false; });
+      addRow.addEventListener("blur", () => { el.draggable = true; });
+      addRow.addEventListener("keydown", e => {
+        e.stopPropagation();
+        if (e.key === "Enter") {
+          const v = addRow.value.trim();
+          if (!v || !backend) return;
+          state.focusAddFor = okey(t.id, day);
+          backend.updateTask(t.id, { subtasks: [...subs, v] });
+        }
+        if (e.key === "Escape") addRow.blur();
+      });
+      list.appendChild(addRow);
+      if (state.focusAddFor === okey(t.id, day)) {
+        state.focusAddFor = null;
+        requestAnimationFrame(() => addRow.focus());
       }
       el.appendChild(list);
     }

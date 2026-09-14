@@ -621,7 +621,7 @@
     <h2>Add something to the board</h2>
     <div class="add-row">
       <input class="add-name" id="addName" type="text" maxlength="120" placeholder="What needs doing?" aria-label="Task name">
-      <input class="add-name add-date" id="addDate" type="date" aria-label="First due date, optional">
+      <input class="add-name add-date" id="addDate" type="date" aria-label="First due date, optional" title="Optional — leave empty for a 'whenever' task that sticks around until it's done">
       <select class="add-name add-repeat" id="addRepeat" aria-label="How often it repeats">
         <option value="none">One-time</option>
         <option value="week-1">Every week</option>
@@ -640,7 +640,7 @@
   </div>
 
   <div class="footer-row">
-    <p class="note">Big buttons are the big deals — click a task to check it off, click again to undo. ✎ adds a shared note (where are we on this?). A task with a checklist opens like a dropdown — check off each item and the task goes green when the list is done; add a checklist in Manage. The Calendar view lays the same month out by date.</p>
+    <p class="note">Big buttons are the big deals — click a task to check it off, click again to undo. ✎ adds a shared note (where are we on this?). A task with a checklist opens like a dropdown — check off each item and the task goes green when the list is done; add a checklist in Manage. A task with no date and no repeat just stays on the board, month after month, until it's done. The Calendar view lays the same month out by date.</p>
     <span style="display:flex; gap:8px; align-items:center;">
       <button class="mini-btn delete" id="removePersonBtn" hidden></button>
       <button class="manage-toggle" id="manageToggle">Manage</button>
@@ -725,7 +725,11 @@
   function occDays(t, M) {
     if (!t.start) {
       if (t.repeat && t.repeat !== "none") return (t.month || "0000-00") <= M ? [null] : [];
-      return (t.month || THIS_MONTH) === M ? [null] : [];
+      // Undated one-time = "don't forget": carries forward until done,
+      // then stays only in the month it was checked off.
+      const home = t.month || THIS_MONTH;
+      if (t.doneAt) return (t.doneMonth || home) === M ? [null] : [];
+      return home <= M ? [null] : [];
     }
     const [sy, sm, sd] = t.start.split("-").map(Number);
     const [y, m] = M.split("-").map(Number);
@@ -1177,13 +1181,26 @@
     $("progressFill").style.width = total ? (100 * doneCount / total) + "%" : "0%";
   }
 
+  // Undated one-time tasks track done-ness on the task itself so they can
+  // roll forward across months until finished.
+  function stampOneTime(t, done) {
+    if (t.start || (t.repeat || "none") !== "none") return;
+    if (done && !t.doneAt) backend.updateTask(t.id, { doneAt: Date.now(), doneMonth: state.month });
+    else if (!done && t.doneAt) backend.updateTask(t.id, { doneAt: null, doneMonth: null });
+  }
+
   // Check or un-check a whole occurrence (checklist tasks toggle every item).
   function toggleOcc(t, day) {
     if (!backend) return;
     const subs = subsOf(t);
     if (!subs.length) {
-      if (state.checks[okey(t.id, day)]) backend.clearCheck(t.id, state.month, day);
-      else backend.setCheck(t.id, state.month, day);
+      if (state.checks[okey(t.id, day)]) {
+        backend.clearCheck(t.id, state.month, day);
+        stampOneTime(t, false);
+      } else {
+        backend.setCheck(t.id, state.month, day);
+        stampOneTime(t, true);
+      }
       return;
     }
     const allDone = occDone(t, day);
@@ -1193,6 +1210,7 @@
       if (allDone && state.checks[k]) backend.clearSubCheck(t.id, state.month, day, sl);
       else if (!allDone && !state.checks[k]) backend.setSubCheck(t.id, state.month, day, sl);
     }
+    stampOneTime(t, !allDone);
   }
 
   function calItem(t, day) {
@@ -1391,8 +1409,14 @@
         row.addEventListener("click", e => {
           e.stopPropagation();
           if (!backend) return;
-          if (c) backend.clearSubCheck(t.id, state.month, day, slug(s));
-          else backend.setSubCheck(t.id, state.month, day, slug(s));
+          if (c) {
+            backend.clearSubCheck(t.id, state.month, day, slug(s));
+            stampOneTime(t, false);
+          } else {
+            backend.setSubCheck(t.id, state.month, day, slug(s));
+            const rest = subs.filter(x => slug(x) !== slug(s));
+            if (rest.every(x => state.checks[okey(t.id, day) + "|" + slug(x)])) stampOneTime(t, true);
+          }
         });
         list.appendChild(row);
       }
@@ -1635,7 +1659,6 @@
   $("addName").addEventListener("keydown", e => { if (e.key === "Enter") addTask(); });
 
   // ---------- boot ----------
-  $("addDate").value = THIS_MONTH + "-" + pad(new Date().getDate());
   updateWhoOptions();
   render();
   (async () => {

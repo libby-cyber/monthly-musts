@@ -29,10 +29,18 @@ module.exports = async (req, res) => {
     return;
   }
 
-  // anything else is a raw file upload (text types arrive as strings)
-  const body = Buffer.isBuffer(req.body) ? req.body
+  // anything else is a raw file upload. Vercel only pre-parses a few
+  // content types into req.body; for the rest, read the stream ourselves.
+  let body = Buffer.isBuffer(req.body) ? req.body
     : typeof req.body === "string" ? Buffer.from(req.body, "utf8")
     : null;
+  if (!body) {
+    try {
+      const chunks = [];
+      for await (const c of req) chunks.push(c);
+      if (chunks.length) body = Buffer.concat(chunks);
+    } catch {}
+  }
   if (!body || !body.length) {
     res.status(400).json({ error: "no_file" });
     return;
@@ -49,7 +57,7 @@ module.exports = async (req, res) => {
     const blob = await put("attachments/" + name, body, {
       access: "public",
       addRandomSuffix: true,
-      contentType: req.headers["content-type"] || "application/octet-stream",
+      contentType: req.headers["x-file-type"] || req.headers["content-type"] || "application/octet-stream",
     });
     res.status(200).json({ url: blob.url, name });
   } catch (e) {

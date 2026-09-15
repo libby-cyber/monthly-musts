@@ -1892,9 +1892,15 @@
     if (body.size > MAX) { fail("too big — 4 MB max"); return; }
     btn.textContent = "uploading…";
     try {
+      // octet-stream is the one type Vercel reliably passes through raw;
+      // the real type rides in x-file-type
       const r = await fetch("/api/upload", {
         method: "POST",
-        headers: { "Content-Type": type, "x-file-name": encodeURIComponent(name) },
+        headers: {
+          "Content-Type": "application/octet-stream",
+          "x-file-type": type,
+          "x-file-name": encodeURIComponent(name),
+        },
         body,
       });
       const out = await r.json().catch(() => ({}));

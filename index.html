@@ -377,6 +377,16 @@
   .cal-anytime .cal-row { display: flex; flex-wrap: wrap; gap: 6px; }
   .cal-anytime .cal-item { font-size: 12.5px; padding: 6px 10px; border-radius: 99px; }
 
+  .att-row { display: flex; flex-wrap: wrap; gap: 4px 12px; }
+  .att-link {
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--accent);
+    text-decoration: none;
+    overflow-wrap: anywhere;
+  }
+  .att-link:hover { text-decoration: underline; }
+
   .photo-row { display: flex; align-items: center; gap: 10px; margin-top: 14px; flex-wrap: wrap; }
   .photo-review {
     margin-top: 14px;
@@ -677,7 +687,7 @@
   </div>
 
   <div class="footer-row">
-    <p class="note">Big buttons are the big deals — click a task to check it off, click again to undo. Drag a task into another section to change how big a deal it is. ✎ adds a shared note (where are we on this?). ☑ list starts a checklist inside a task — it opens like a dropdown, you can add items right in the open list, and the task goes green when every item is checked. Manage (up top) is where you rename, reschedule, reassign, add checklists, and delete. A task with no date and no repeat stays on the board until it's done.</p>
+    <p class="note">Big buttons are the big deals — click a task to check it off, click again to undo. Drag a task into another section to change how big a deal it is. ✎ adds a shared note (where are we on this?), 📎 attaches a file (an invoice, a form, a photo). ☑ list starts a checklist inside a task — it opens like a dropdown, you can add items right in the open list, and the task goes green when every item is checked. Manage (up top) is where you rename, reschedule, reassign, add checklists, and delete. A task with no date and no repeat stays on the board until it's done.</p>
     <button class="mini-btn delete" id="removePersonBtn" hidden></button>
   </div>
 </div>
@@ -797,6 +807,11 @@
   }
   function subsOf(t) {
     return Array.isArray(t.subtasks) ? t.subtasks.filter(s => typeof s === "string" && s.trim()) : [];
+  }
+  function attachmentsOf(t) {
+    return Array.isArray(t.attachments)
+      ? t.attachments.filter(a => a && typeof a.url === "string" && a.url)
+      : [];
   }
   // Tasks written before multi-assign carried a single `assignee` string.
   function assigneesOf(t) {
@@ -1418,6 +1433,21 @@
       noteBtn.title = noteRec && noteRec.text ? "Edit the note" : "Add a note — where are we on this?";
       noteBtn.addEventListener("click", e => { e.stopPropagation(); openNoteEditor(); });
       meta.appendChild(noteBtn);
+      const attBtn = document.createElement("button");
+      attBtn.type = "button";
+      attBtn.className = "note-btn no-toggle";
+      attBtn.textContent = "📎";
+      attBtn.title = "Attach a file (up to 4 MB — big photos get shrunk automatically)";
+      attBtn.addEventListener("click", e => {
+        e.stopPropagation();
+        const fi = document.createElement("input");
+        fi.type = "file";
+        fi.addEventListener("change", () => {
+          if (fi.files && fi.files[0]) uploadAttachment(t, fi.files[0], attBtn);
+        });
+        fi.click();
+      });
+      meta.appendChild(attBtn);
       if (subs.length) {
         const chev = document.createElement("span");
         chev.className = "chev";
@@ -1458,6 +1488,24 @@
         });
         meta.appendChild(listBtn);
       }
+    }
+
+    // attachment links
+    const atts = attachmentsOf(t);
+    if (atts.length && !state.manage) {
+      const ar = document.createElement("span");
+      ar.className = "att-row no-toggle";
+      for (const a of atts) {
+        const link = document.createElement("a");
+        link.className = "att-link";
+        link.href = a.url;
+        link.target = "_blank";
+        link.rel = "noopener";
+        link.textContent = "📎 " + (a.name || "file");
+        link.addEventListener("click", e => e.stopPropagation());
+        ar.appendChild(link);
+      }
+      el.appendChild(ar);
     }
 
     // open checklist dropdown
@@ -1649,6 +1697,38 @@
 
       controls.append(sizeBtn, dateInput, repSel, ...whoChips, listBtn, delBtn);
       el.appendChild(controls);
+      if (atts.length) {
+        const arm = document.createElement("span");
+        arm.className = "manage-controls";
+        for (const a of atts) {
+          const rm = document.createElement("button");
+          rm.className = "mini-btn";
+          rm.textContent = "📎 " + (a.name || "file") + "  ✕";
+          rm.title = "Remove this attachment";
+          let rmArmed = false;
+          rm.addEventListener("click", async () => {
+            if (!rmArmed) {
+              rmArmed = true;
+              rm.textContent = "Really remove?";
+              rm.classList.add("delete", "armed");
+              setTimeout(() => {
+                rmArmed = false;
+                rm.textContent = "📎 " + (a.name || "file") + "  ✕";
+                rm.classList.remove("delete", "armed");
+              }, 4000);
+              return;
+            }
+            await backend.updateTask(t.id, { attachments: atts.filter(x => x.url !== a.url) });
+            fetch("/api/upload", {
+              method: "POST",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify({ delete: a.url }),
+            }).catch(() => {});
+          });
+          arm.appendChild(rm);
+        }
+        el.appendChild(arm);
+      }
     } else {
       el.draggable = true;
       el.addEventListener("dragstart", e => {
@@ -1788,6 +1868,47 @@
   }
   $("addBtn").addEventListener("click", addTask);
   $("addName").addEventListener("keydown", e => { if (e.key === "Enter") addTask(); });
+
+  // ---------- attachments ----------
+  async function uploadAttachment(t, file, btn) {
+    if (!backend) return;
+    const orig = "📎";
+    const fail = msg => {
+      btn.textContent = msg;
+      setTimeout(() => { btn.textContent = orig; }, 3500);
+    };
+    let body = file;
+    let type = file.type || "application/octet-stream";
+    let name = file.name || "file";
+    const MAX = 4 * 1024 * 1024;
+    if (file.size > MAX && type.startsWith("image/")) {
+      try {
+        const b64 = await fileToResizedB64(file);
+        body = await (await fetch("data:image/jpeg;base64," + b64)).blob();
+        type = "image/jpeg";
+        name = name.replace(/\.\w+$/, "") + ".jpg";
+      } catch { fail("couldn't read that image"); return; }
+    }
+    if (body.size > MAX) { fail("too big — 4 MB max"); return; }
+    btn.textContent = "uploading…";
+    try {
+      const r = await fetch("/api/upload", {
+        method: "POST",
+        headers: { "Content-Type": type, "x-file-name": encodeURIComponent(name) },
+        body,
+      });
+      const out = await r.json().catch(() => ({}));
+      if (!r.ok || !out.url) {
+        fail(out.error === "no_store" ? "needs a one-time Vercel setup" : "upload failed — try again");
+        return;
+      }
+      btn.textContent = orig;
+      const atts = attachmentsOf(t).concat([{ name: out.name || name, url: out.url, at: Date.now() }]).slice(0, 10);
+      await backend.updateTask(t.id, { attachments: atts });
+    } catch {
+      fail(location.protocol === "file:" ? "live site only" : "upload failed — try again");
+    }
+  }
 
   // ---------- photo import ----------
   async function fileToResizedB64(file) {

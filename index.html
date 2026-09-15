@@ -1899,7 +1899,9 @@
       });
       const out = await r.json().catch(() => ({}));
       if (!r.ok || !out.url) {
-        fail(out.error === "no_store" ? "needs a one-time Vercel setup" : "upload failed — try again");
+        fail(out.error === "no_store" ? "needs a one-time Vercel setup"
+          : out.error === "private_store" ? "store must be Public — recreate it"
+          : "upload failed — try again");
         return;
       }
       btn.textContent = orig;

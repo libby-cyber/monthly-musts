@@ -1,17 +1,12 @@
 // Stores task attachments in Vercel Blob and deletes them again.
-// Requires a Blob store connected to the project (BLOB_READ_WRITE_TOKEN).
+// Auth: OIDC via the connected store (BLOB_STORE_ID + VERCEL_OIDC_TOKEN,
+// read automatically by the SDK), or a legacy BLOB_READ_WRITE_TOKEN.
 const { put, del } = require("@vercel/blob");
 
 const MAX_BYTES = Math.floor(4.4 * 1024 * 1024);
 
-// The connect flow names the token BLOB_READ_WRITE_TOKEN by default, but a
-// custom-prefixed store yields e.g. MYSTORE_READ_WRITE_TOKEN — accept any.
-function blobToken() {
-  if (process.env.BLOB_READ_WRITE_TOKEN) return process.env.BLOB_READ_WRITE_TOKEN;
-  for (const [k, v] of Object.entries(process.env)) {
-    if (k.endsWith("_READ_WRITE_TOKEN") && typeof v === "string" && v.startsWith("vercel_blob_")) return v;
-  }
-  return null;
+function storeConnected() {
+  return Boolean(process.env.BLOB_STORE_ID || process.env.BLOB_READ_WRITE_TOKEN);
 }
 
 module.exports = async (req, res) => {
@@ -19,8 +14,7 @@ module.exports = async (req, res) => {
     res.status(405).json({ error: "method_not_allowed" });
     return;
   }
-  const token = blobToken();
-  if (!token) {
+  if (!storeConnected()) {
     res.status(500).json({ error: "no_store" });
     return;
   }
@@ -29,7 +23,7 @@ module.exports = async (req, res) => {
   if (req.body && typeof req.body === "object" && !Buffer.isBuffer(req.body) && req.body.delete) {
     const url = String(req.body.delete);
     if (url.includes(".blob.vercel-storage.com/")) {
-      try { await del(url, { token }); } catch (e) { console.error("blob delete failed", e); }
+      try { await del(url); } catch (e) { console.error("blob delete failed", e); }
     }
     res.status(200).json({ ok: true });
     return;
@@ -54,11 +48,15 @@ module.exports = async (req, res) => {
       access: "public",
       addRandomSuffix: true,
       contentType: req.headers["content-type"] || "application/octet-stream",
-      token,
     });
     res.status(200).json({ url: blob.url, name });
   } catch (e) {
     console.error("blob upload failed", e);
-    res.status(500).json({ error: "upload_failed" });
+    const msg = String((e && e.message) || "");
+    if (/private|access/i.test(msg)) {
+      res.status(500).json({ error: "private_store" });
+    } else {
+      res.status(500).json({ error: "upload_failed" });
+    }
   }
 };

@@ -29,8 +29,10 @@ module.exports = async (req, res) => {
     return;
   }
 
-  // anything else is a raw file upload
-  const body = Buffer.isBuffer(req.body) ? req.body : null;
+  // anything else is a raw file upload (text types arrive as strings)
+  const body = Buffer.isBuffer(req.body) ? req.body
+    : typeof req.body === "string" ? Buffer.from(req.body, "utf8")
+    : null;
   if (!body || !body.length) {
     res.status(400).json({ error: "no_file" });
     return;

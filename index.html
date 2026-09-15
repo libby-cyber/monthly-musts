@@ -377,6 +377,9 @@
   .cal-anytime .cal-row { display: flex; flex-wrap: wrap; gap: 6px; }
   .cal-anytime .cal-item { font-size: 12.5px; padding: 6px 10px; border-radius: 99px; }
 
+  .pass-row { display: flex; flex-wrap: wrap; gap: 6px; flex-basis: 100%; align-items: center; }
+  .pass-row .pass-hint { font-size: 12px; color: var(--muted); font-weight: 600; }
+
   .att-row { display: flex; flex-wrap: wrap; gap: 4px 12px; }
   .att-link {
     font-size: 12px;
@@ -687,7 +690,7 @@
   </div>
 
   <div class="footer-row">
-    <p class="note">Big buttons are the big deals — click a task to check it off, click again to undo. Drag a task into another section to change how big a deal it is. ✎ adds a shared note (where are we on this?), 📎 attaches a file (an invoice, a form, a photo). ☑ list starts a checklist inside a task — it opens like a dropdown, you can add items right in the open list, and the task goes green when every item is checked. Manage (up top) is where you rename, reschedule, reassign, add checklists, and delete. A task with no date and no repeat stays on the board until it's done.</p>
+    <p class="note">Big buttons are the big deals — click a task to check it off, click again to undo. Drag a task into another section to change how big a deal it is. ✎ adds a shared note (where are we on this?), 📎 attaches a file (an invoice, a form, a photo), → pass hands the task to whoever works on it next. ☑ list starts a checklist inside a task — it opens like a dropdown, you can add items right in the open list, and the task goes green when every item is checked. Manage (up top) is where you rename, reschedule, reassign, add checklists, and delete. A task with no date and no repeat stays on the board until it's done.</p>
     <button class="mini-btn delete" id="removePersonBtn" hidden></button>
   </div>
 </div>
@@ -849,6 +852,7 @@
     view: "board",    // "board" | "calendar"
     addWho: new Set(),   // people picked in the add form
     focusAddFor: null,   // refocus the "+ add item" input after a render
+    passFor: null,       // tile with the pass-off picker open, keyed by okey
     expanded: new Set(), // open checklist dropdowns, keyed by okey
     manage: false,
     addImportance: 3,
@@ -1448,6 +1452,19 @@
         fi.click();
       });
       meta.appendChild(attBtn);
+      if (state.people.length) {
+        const passBtn = document.createElement("button");
+        passBtn.type = "button";
+        passBtn.className = "note-btn no-toggle";
+        passBtn.textContent = "→ pass";
+        passBtn.title = "Pass this task off to whoever works on it next";
+        passBtn.addEventListener("click", e => {
+          e.stopPropagation();
+          state.passFor = state.passFor === okey(t.id, day) ? null : okey(t.id, day);
+          render();
+        });
+        meta.appendChild(passBtn);
+      }
       if (subs.length) {
         const chev = document.createElement("span");
         chev.className = "chev";
@@ -1488,6 +1505,39 @@
         });
         meta.appendChild(listBtn);
       }
+    }
+
+    // pass-off picker: tap the next person and the task moves to them
+    if (!state.manage && state.passFor === okey(t.id, day)) {
+      const pr = document.createElement("span");
+      pr.className = "pass-row no-toggle";
+      const hint = document.createElement("span");
+      hint.className = "pass-hint";
+      hint.textContent = "pass to:";
+      pr.appendChild(hint);
+      const current = assigneesOf(t);
+      const pick = async who => {
+        state.passFor = null;
+        try { await backend.updateTask(t.id, { assignees: who ? [who] : [], assignee: null }); } catch {}
+        render();
+      };
+      for (const p of state.people) {
+        const chip = document.createElement("button");
+        chip.type = "button";
+        chip.className = "who-chip small" + (current.includes(p) ? " sel" : "");
+        chip.textContent = p;
+        chip.title = current.includes(p) ? p + " has it now" : "Pass to " + p;
+        chip.addEventListener("click", e => { e.stopPropagation(); pick(p); });
+        pr.appendChild(chip);
+      }
+      const anyChip = document.createElement("button");
+      anyChip.type = "button";
+      anyChip.className = "who-chip small" + (current.length ? "" : " sel");
+      anyChip.textContent = "Anyone";
+      anyChip.title = "Put it back up for grabs";
+      anyChip.addEventListener("click", e => { e.stopPropagation(); pick(null); });
+      pr.appendChild(anyChip);
+      el.appendChild(pr);
     }
 
     // attachment links
